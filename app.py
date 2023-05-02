@@ -1,49 +1,54 @@
-import time
-
-from selenium.webdriver.common.by import By
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-driver = webdriver.Chrome()
-driver.get("https://www.tradingview.com/symbols/AUDJPY/technicals/?exchange=FX")
-trends = ["strong-buy", "strong-sell", "buy", "sell", "neutral"]
-
-try:
-    button_4h = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "1h")))
+import os
+from asset_analyzer import AssetAnalyzer
 
 
-    container = driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
-    summary = container.find_element(By.CLASS_NAME, "container-zq7XRf30")
-    #class_names = summary.get_attribute("class").split(" ")
-    class_names = summary.get_attribute("class")
-    print(class_names)
-    for trend in trends:
-        if trend in class_names:
-            print("1D summary", trend)
-            break
+def welcome_user():
+    print("*** Welcome to Trading Assistent 1.0 *** \nTo start analysis, enter '1'. \nTo print help, enter '2' \nTo "
+          "exit the program, enter '3'")
+    choice = int(input("Your selection: "))
+    return choice
 
-    button_4h.click()
-    time.sleep(1) # Necessary in order to wait for the right class assignment. No work around found yet
-    container = driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
-    summary = container.find_element(By.CLASS_NAME, "container-zq7XRf30")
-    class_names = summary.get_attribute("class")
-    for trend in trends:
-        if trend in class_names:
-            print("1H summary", trend)
-            break
 
-except TimeoutError:
-    print("Element not found")
-    driver.quit()
+def print_help():
+    print('This is a simple trading assistant / asset analyzer. ')
+
+def new_analysis_choice():
+    choice = int(input("To analyze new ticker, enter 1. To return to main menu, enter 2: "))
+    return choice
 
 
 
 
+def run_program():
+    menu_choice = welcome_user()
+
+    while menu_choice != 3:
+        if menu_choice == 1:
+            analyze_choice = new_analysis_choice()
+            if analyze_choice == 1:
+                ticker = input("Enter a ticker to analyze: ")
+                ticker_analyzer = AssetAnalyzer(ticker)
+            else:
+                menu_choice = welcome_user()
+
+        elif menu_choice == 2:
+            print_help()
+            input("Press enter to return to main menu ")
+            menu_choice = welcome_user()
 
 
-"""    #button_4h = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "4h")))
-    container = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "summary-kg4MJrFB")))
-    summary = WebDriverWait(container, 5).until(EC.presence_of_element_located((By.CLASS_NAME, "container-zq7XRf30")))"""
 
+    print("End of program")
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    run_program()
