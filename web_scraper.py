@@ -16,12 +16,13 @@ class WebScraper:
         self.driver = None
         self.constants = Constants()
 
-    def open_browser(self):
+    def open_browser(self, chrome_options=None):
         if self.driver is None:
-            chrome_options = Options()
+            if chrome_options is None:
+                chrome_options = Options()
+                chrome_options.add_argument('--headless')
+                chrome_options.add_argument('window-size=1200,1100');
 
-            chrome_options.add_argument('--headless')
-            chrome_options.add_argument('window-size=1200,1100');
             self.driver = webdriver.Chrome(options=chrome_options)
 
             """# For debugging purposes -> to see how selenium interacts on the screen ↓
@@ -93,9 +94,13 @@ class WebScraper:
 
 
 
+    # Unfortunately this method has to run with browser visible to the user, otherwise elements are not visible/present
     def get_investing_data(self, ticker):
         trend_results = {}
-        self.open_browser()  # Open browser window
+        chrome_options = Options()
+        chrome_options.add_argument("--start-maximized")
+
+        self.open_browser(chrome_options=chrome_options)  # Open browser window
 
         try:
             #Open investing.com with a specific ticker to analyse (need to format user's input first ↓)

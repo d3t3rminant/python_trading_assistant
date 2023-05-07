@@ -32,6 +32,26 @@ def new_analysis_choice():
         except ValueError:
             print("\nPlease enter a valid number")
 
+
+def print_out_analysis_results(ticker, data):
+    print(f"Analysis for {ticker}:")
+    print("- Market Sentiment: {} Short, {} Long".format(data['sentiment']['short'], data['sentiment']['long']))
+    print("- TradingView Technical Analysis:")
+    print("  * Weekly: {}".format(data['trading_view']['1W'].upper()))
+    print("  * Daily: {}".format(data['trading_view']['1D'].upper()))
+    print("  * 4 Hour: {}".format(data['trading_view']['4h'].capitalize()))
+    print("  * 1 Hour: {}".format(data['trading_view']['1h'].capitalize()))
+    print("  * 15 Minute: {}".format(data['trading_view']['15m'].capitalize()))
+    print("  * 5 Minute: {}".format(data['trading_view']['5m'].capitalize()))
+    print("- Investing.com Technical Analysis:")
+    print("  * Weekly: {}".format(data['investing']['1W'].upper()))
+    print("  * Daily: {}".format(data['investing']['1D'].upper()))
+    print("  * 1 Hour: {}".format(data['investing']['1H'].capitalize()))
+    print("  * 15 Minute: {}".format(data['investing']['15M'].capitalize()))
+    print("  * 5 Minute: {}".format(data['investing']['5M'].capitalize()))
+
+
+
 # TODO: Add option to list out available tickers
 # TODO: Add warning if not known ticker is entered
 def run_program():
@@ -45,7 +65,9 @@ def run_program():
                 if analyze_choice == 1: # Single ticker analysis
                     ticker = input("Enter a ticker to analyze: ")
                     asset_analyzer = AssetAnalyzer()
-                    print(asset_analyzer.analyze_ticker(ticker))
+                    analysis_results = asset_analyzer.analyze_ticker(ticker)
+                    print_out_analysis_results(ticker, analysis_results)
+
                     analyze_choice = new_analysis_choice()
 
                 elif analyze_choice == 2: # Most trending assets

@@ -5,16 +5,17 @@ class AssetAnalyzer:
 
 
     def analyze_ticker(self, ticker):
-        print("Retrieving data from trading view")
-        #trading_view_results = self.web_scraper.get_trading_view_data(ticker)
-        print("Retrieving data from investing.com")
+        analysis_data = {}
 
-        #investing_results = self.web_scraper.get_investing_data(ticker)
-        #print("Retrieving market sentiment")
+        print("Retrieving data from Trading View, hold on...")
+        analysis_data['trading_view'] = self.web_scraper.get_trading_view_data(ticker)
 
-        market_sentiment = self.web_scraper.get_sentiment(ticker)
-        analysis = f"This is analysis of {ticker} \n {market_sentiment} \n"
-        return analysis
+        print("Retrieving data from investing.com, just a second...")
+        analysis_data['investing'] = self.web_scraper.get_investing_data(ticker)
+
+        print("Retrieving market sentiment, almost done...")
+        analysis_data['sentiment'] = self.web_scraper.get_sentiment(ticker)
+        return analysis_data
 
 
     def analyze_trending(self, major_assets):
