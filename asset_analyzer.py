@@ -10,7 +10,7 @@ class AssetAnalyzer:
         #market_sentiment = self.web_scraper.get_sentiment(ticker)
         analysis = f"Tohle je analyza tickeru {ticker} \n {trading_view_results} \n"
         return analysis
-    #
+
 
     def analyze_trending(self, major_assets):
         trending_assets = []

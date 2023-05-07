@@ -19,12 +19,21 @@ class WebScraper:
         if self.driver is None:
             chrome_options = Options()
             chrome_options.add_argument('--headless')
-            self.driver = webdriver.Chrome(options=chrome_options)
+            chrome_options.add_argument('--disable-gpu')
+            chrome_options2 = Options()
+            chrome_options2.add_argument("--start-maximized")
+            self.driver = webdriver.Chrome(options=chrome_options2) #options=chrome_options)
 
     def close_browser(self):
         if self.driver is not None:
             self.driver.quit()
             self.driver = None
+    @staticmethod
+    def format_ticker_for_investing(input_str):
+        if len(input_str) == 6:
+            return input_str[:3].lower() + '-' + input_str[3:].lower()
+        else:
+            raise ValueError("Input string must be 6 characters long")
 
     def get_trading_view_data(self, ticker):
         trend_results = {}
@@ -34,8 +43,26 @@ class WebScraper:
             for time_frame in self.constants.trading_view_time_frames: # TODO: Change for tf locators/ids
                 button_tf = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.ID, time_frame)))
                 button_tf.click()
-                time.sleep(1)  # Necessary in order to wait for the right class assignment. TODO: Find workaround
-                div_container = self.driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
+
+                # In case my code breaks down, this worked :) ↓
+                #time.sleep(1)  # Necessary in order to wait for the right class assignment.
+                #div_container = self.driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
+
+
+                div_container = WebDriverWait(self.driver, 5)\
+                    .until(EC.presence_of_element_located((By.CLASS_NAME, "summary-kg4MJrFB")))
+
+                # Necessary for JS to display accurate info in "summary" section
+                WebDriverWait(self.driver, 5).until(
+                    EC.visibility_of_any_elements_located(
+                       (By.CSS_SELECTOR, '[class*=strong-sell], '
+                                         '[class*=sell-], '
+                                         '[class*=buy-], '
+                                         '[class*=neutral-], '
+                                         '[class*=strong-buy-]' )
+                    )
+                )
+                time.sleep(0.5) # necessary for my sluggish internet to load the correct info lol
                 div_summary = div_container.find_element(By.CLASS_NAME, "container-zq7XRf30")
                 class_names = div_summary.get_attribute("class")
 
@@ -47,10 +74,57 @@ class WebScraper:
                         trend_results[time_frame] = "Not available"
         except AttributeError:
             return None
+        except TimeoutError:
+            return None
+        self.close_browser()
         return trend_results
+        # TODO: Update exceptions and test it
+        # TODO: Add exception if not known ticker is entered and page is not found
+
+
 
     def get_investing_data(self, ticker):
-        pass
+        trend_results = {}
+        self.open_browser()  # Open browser window
+
+        try:
+            self.driver.get(f"https://www.investing.com/currencies/{WebScraper.format_ticker_for_investing(ticker)}-technical")
+            for time_frame in self.constants.trading_view_time_frames:  # TODO: Change for tf locators/ids
+                button_tf = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.ID, time_frame)))
+                button_tf.click()
+
+                # In case my code breaks down, this worked :) ↓
+                # time.sleep(1)  # Necessary in order to wait for the right class assignment.
+                # div_container = self.driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
+
+                div_container = WebDriverWait(self.driver, 5) \
+                    .until(EC.presence_of_element_located((By.CLASS_NAME, "summary-kg4MJrFB")))
+
+                # Necessary for JS to display accurate info in "summary" section
+                WebDriverWait(self.driver, 5).until(
+                    EC.visibility_of_any_elements_located(
+                        (By.CSS_SELECTOR, '[class*=strong-sell], '
+                                          '[class*=sell-], '
+                                          '[class*=buy-], '
+                                          '[class*=neutral-], '
+                                          '[class*=strong-buy-]')
+                    )
+                )
+
+                div_summary = div_container.find_element(By.CLASS_NAME, "container-zq7XRf30")
+                class_names = div_summary.get_attribute("class")
+
+                for trend in self.class_trends:
+                    if trend in class_names:
+                        trend_results[time_frame] = trend
+                        break
+                    else:
+                        trend_results[time_frame] = "Not available"
+        except (AttributeError, TimeoutError):
+            return None
+
+        self.close_browser()
+        return trend_results
 
     def get_sentiment(self, ticker):
         pass
