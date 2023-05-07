@@ -1,5 +1,6 @@
 import time
 
+import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -18,11 +19,15 @@ class WebScraper:
     def open_browser(self):
         if self.driver is None:
             chrome_options = Options()
-            chrome_options.add_argument('--headless')
-            chrome_options.add_argument('--disable-gpu')
+
+            """chrome_options.add_argument('--headless')
+            chrome_options.add_argument('window-size=1200,1100');
+            self.driver = webdriver.Chrome(options=chrome_options)"""
+
+            # For debugging purposes -> to see how selenium interacts on the screen ↓
             chrome_options2 = Options()
             chrome_options2.add_argument("--start-maximized")
-            self.driver = webdriver.Chrome(options=chrome_options2) #options=chrome_options)
+            self.driver = webdriver.Chrome(options=chrome_options2)
 
     def close_browser(self):
         if self.driver is not None:
@@ -39,9 +44,14 @@ class WebScraper:
         trend_results = {}
         self.open_browser() # Open browser window
         try:
+            #Open tradinview.com with a specific ticker to analyse ↓
             self.driver.get(f"https://www.tradingview.com/symbols/{ticker}/technicals/?exchange=FX")
+
+
+
             for time_frame in self.constants.trading_view_time_frames: # TODO: Change for tf locators/ids
-                button_tf = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.ID, time_frame)))
+                button_tf = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, time_frame)))
+
                 button_tf.click()
 
                 # In case my code breaks down, this worked :) ↓
@@ -88,43 +98,47 @@ class WebScraper:
         self.open_browser()  # Open browser window
 
         try:
+            #Open investing.com with a specific ticker to analyse (need to format user's input first ↓)
             self.driver.get(f"https://www.investing.com/currencies/{WebScraper.format_ticker_for_investing(ticker)}-technical")
-            for time_frame in self.constants.trading_view_time_frames:  # TODO: Change for tf locators/ids
-                button_tf = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.ID, time_frame)))
+
+            # Consent to cookies to continue to the site ↓
+            accept_cookies_button = WebDriverWait(self.driver, 5) \
+                .until(EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler")))
+            accept_cookies_button.click()
+
+            # Contains every button to change the time frame of Technical Analysis
+            buttons_container = WebDriverWait(self.driver, 3)\
+                .until(EC.presence_of_element_located((By.ID, "technicalstudiesSubTabs")))
+
+
+
+
+            for time_frame in self.constants.investing_time_frames_map.keys(): # dictionary of {'300':'5M'}-like pairs
+                # Find button with specific TF ↓, click the button to change the TF
+                button_tf = WebDriverWait(buttons_container,3)\
+                    .until(EC.presence_of_element_located((By.XPATH, f"//li[@data-period='{time_frame}']")))
                 button_tf.click()
+                # Then the webpage starts to load technical indicators for this particular time frame period
 
-                # In case my code breaks down, this worked :) ↓
-                # time.sleep(1)  # Necessary in order to wait for the right class assignment.
-                # div_container = self.driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
 
-                div_container = WebDriverWait(self.driver, 5) \
-                    .until(EC.presence_of_element_located((By.CLASS_NAME, "summary-kg4MJrFB")))
+                # Technical indicators Summary container with a single span element
+                summary_container = WebDriverWait(self.driver, 3) \
+                    .until(EC.visibility_of_element_located((By.CLASS_NAME, "summary")))
 
-                # Necessary for JS to display accurate info in "summary" section
-                WebDriverWait(self.driver, 5).until(
-                    EC.visibility_of_any_elements_located(
-                        (By.CSS_SELECTOR, '[class*=strong-sell], '
-                                          '[class*=sell-], '
-                                          '[class*=buy-], '
-                                          '[class*=neutral-], '
-                                          '[class*=strong-buy-]')
-                    )
-                )
+                # A <span> element with text containing trend direction (buy/sell etc) ↓
+                technical_summary = WebDriverWait(summary_container, 3) \
+                    .until(EC.presence_of_element_located((By.TAG_NAME, "span")))
+                trend_results[self.constants.investing_time_frames_map[time_frame]] = technical_summary.text
 
-                div_summary = div_container.find_element(By.CLASS_NAME, "container-zq7XRf30")
-                class_names = div_summary.get_attribute("class")
 
-                for trend in self.class_trends:
-                    if trend in class_names:
-                        trend_results[time_frame] = trend
-                        break
-                    else:
-                        trend_results[time_frame] = "Not available"
-        except (AttributeError, TimeoutError):
-            return None
+        except:
+            print("Unexpected error during retrieving data from investing.com ")
 
-        self.close_browser()
+        finally:
+            self.close_browser()
+
         return trend_results
+
 
     def get_sentiment(self, ticker):
         pass

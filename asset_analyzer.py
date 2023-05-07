@@ -5,10 +5,15 @@ class AssetAnalyzer:
 
 
     def analyze_ticker(self, ticker):
-        trading_view_results = self.web_scraper.get_trading_view_data(ticker)
-        #investing_results = self.web_scraper.get_investing_data(ticker)
+        print("Retrieving data from trading view")
+        #trading_view_results = self.web_scraper.get_trading_view_data(ticker)
+        print("Retrieving data from investing.com")
+
+        investing_results = self.web_scraper.get_investing_data(ticker)
+        #print("Retrieving market sentiment")
+
         #market_sentiment = self.web_scraper.get_sentiment(ticker)
-        analysis = f"Tohle je analyza tickeru {ticker} \n {trading_view_results} \n"
+        analysis = f"This is analysis of {ticker} \n {investing_results} \n"
         return analysis
 
 
