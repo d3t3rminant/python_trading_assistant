@@ -20,14 +20,14 @@ class WebScraper:
         if self.driver is None:
             chrome_options = Options()
 
-            """chrome_options.add_argument('--headless')
+            chrome_options.add_argument('--headless')
             chrome_options.add_argument('window-size=1200,1100');
-            self.driver = webdriver.Chrome(options=chrome_options)"""
+            self.driver = webdriver.Chrome(options=chrome_options)
 
-            # For debugging purposes -> to see how selenium interacts on the screen ↓
+            """# For debugging purposes -> to see how selenium interacts on the screen ↓
             chrome_options2 = Options()
             chrome_options2.add_argument("--start-maximized")
-            self.driver = webdriver.Chrome(options=chrome_options2)
+            self.driver = webdriver.Chrome(options=chrome_options2)"""
 
     def close_browser(self):
         if self.driver is not None:
@@ -141,5 +141,26 @@ class WebScraper:
 
 
     def get_sentiment(self, ticker):
-        pass
+        sentiment_results = {}
+        self.open_browser()
 
+        self.driver.get(f"https://www.myfxbook.com/community/outlook/{ticker}")
+        try:
+            metrics_table = WebDriverWait(self.driver, 5)\
+                .until(EC.visibility_of_element_located((By.ID, "currentMetricsTable")))
+
+
+            short_row = metrics_table.find_element(By.XPATH, ".//tr[2]")  # Get the Short row
+            short_percentage = short_row.find_element(By.XPATH, ".//td[2]").text  # Get the Short percentage
+
+            long_row = metrics_table.find_element(By.XPATH, ".//tr[3]")  # Get the Long row
+            long_percentage = long_row.find_element(By.XPATH, ".//td[2]").text  # Get the Long percentage
+
+            sentiment_results["short"] = short_percentage
+            sentiment_results["long"] = long_percentage
+        except:
+            print("Unexpected error while retrieving results from myfxbook.com")
+        finally:
+            self.close_browser()
+
+        return sentiment_results

@@ -9,11 +9,11 @@ class AssetAnalyzer:
         #trading_view_results = self.web_scraper.get_trading_view_data(ticker)
         print("Retrieving data from investing.com")
 
-        investing_results = self.web_scraper.get_investing_data(ticker)
+        #investing_results = self.web_scraper.get_investing_data(ticker)
         #print("Retrieving market sentiment")
 
-        #market_sentiment = self.web_scraper.get_sentiment(ticker)
-        analysis = f"This is analysis of {ticker} \n {investing_results} \n"
+        market_sentiment = self.web_scraper.get_sentiment(ticker)
+        analysis = f"This is analysis of {ticker} \n {market_sentiment} \n"
         return analysis
 
 
