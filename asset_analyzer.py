@@ -1,4 +1,5 @@
 from web_scraper import WebScraper
+
 class AssetAnalyzer:
     def __init__(self):
         self.web_scraper = WebScraper()
@@ -17,8 +18,7 @@ class AssetAnalyzer:
         analysis_data['sentiment'] = self.web_scraper.get_sentiment(ticker)
         return analysis_data
 
-
-    def analyze_trending(self, major_assets):
+    def analyze_trending(self, major_assets): # Will do in version 2
         trending_assets = []
         for asset in major_assets:
             analysis_results = self.analyze_ticker(asset)

@@ -1,5 +1,5 @@
 import time
-
+import logging
 import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 from selenium import webdriver
@@ -9,9 +9,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from constants import Constants
 from selenium.webdriver.chrome.options import Options
 
+logger = logging.getLogger(__name__)
+
 class WebScraper:
     #Class Variables
-    class_trends = ["strong-buy", "strong-sell", "buy", "sell", "neutral"] # css class selector in Trading View
+    class_trends_trading_view = ["strong-buy", "strong-sell", "buy", "sell", "neutral"] # css class selector in Trading View html
     def __init__(self):
         self.driver = None
         self.constants = Constants()
@@ -77,24 +79,33 @@ class WebScraper:
                 div_summary = div_container.find_element(By.CLASS_NAME, "container-zq7XRf30")
                 class_names = div_summary.get_attribute("class")
 
-                for trend in self.class_trends:
+                for trend in self.class_trends_trading_view:
                     if trend in class_names:
                         trend_results[time_frame] = trend
                         break
                     else:
                         trend_results[time_frame] = "Not available"
-        except AttributeError:
-            return None
-        except TimeoutError:
-            return None
-        self.close_browser()
+
+        except selenium.common.exceptions.TimeoutException as e:
+            print('Timeout error while fetching data from TradingView ')
+            logger.error(f'A Selenium error occured: {e}')
+
+        except Exception as e:
+            print(f'Unexpected error while fetching data from TradingView \n Error: {e}')
+            logger.error(f'An error occured: {e}')
+
+        finally:
+            self.close_browser()
+
         return trend_results
-        # TODO: Update exceptions and test it
-        # TODO: Add exception if not known ticker is entered and page is not found
 
 
 
-    # Unfortunately this method has to run with browser visible to the user, otherwise elements are not visible/present
+
+
+
+
+    # Unfortunately this method has to run with browser visible to the user, otherwise html elements are not present/interactable
     def get_investing_data(self, ticker):
         trend_results = {}
         chrome_options = Options()
@@ -135,15 +146,16 @@ class WebScraper:
                     .until(EC.presence_of_element_located((By.TAG_NAME, "span")))
                 trend_results[self.constants.investing_time_frames_map[time_frame]] = technical_summary.text
 
+        except selenium.common.exceptions.TimeoutException as e:
+            print('Timeout error while fetching data from Investing.com ')
+            logger.error(f'A Selenium error occured: {e}')
 
-        except:
-            print("Unexpected error during retrieving data from investing.com ")
-
+        except Exception as e:
+            print(f'Unexpected error while fetching data from Investing.com  \n Error: {e}')
         finally:
             self.close_browser()
 
         return trend_results
-
 
     def get_sentiment(self, ticker):
         sentiment_results = {}
@@ -163,8 +175,17 @@ class WebScraper:
 
             sentiment_results["short"] = short_percentage
             sentiment_results["long"] = long_percentage
-        except:
-            print("Unexpected error while retrieving results from myfxbook.com")
+
+        except selenium.common.exceptions.TimeoutException as e:
+            print("Timeout error while fetching data from Investing.com ")
+            logger.error(f'A Selenium Timeout error occured: {e}')
+
+        except selenium.common.exceptions.NoSuchElementException as e:
+            print("Couldn't locate elements to interact with on Investing.com ")
+            logger.error(f'A Selenium NoSuchElement error occured: {e}')
+
+        except Exception as e:
+            print(f"Unexpected error while retrieving results from myfxbook.com \n Error: {e}")
         finally:
             self.close_browser()
 

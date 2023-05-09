@@ -1,9 +1,13 @@
 from asset_analyzer import AssetAnalyzer
 from constants import Constants
+import logging
 
+logging.basicConfig(filename='logs/app.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def welcome_user():
-    print("*** Welcome to Trading Assistent 1.0 *** \nTo start analysis, enter '1'. \nTo print help, enter '2' \nTo "
+    print("*** Welcome to Forex Trading Assistent 1.0 *** \nTo start analysis, enter '1'. \nTo print help, enter '2' \nTo "
           "exit the program, enter '3'")
     while True:
         try:
@@ -17,10 +21,10 @@ def welcome_user():
 
 
 def print_help():
-    print('This is a simple trading assistant / asset analyzer. ')
+    print('This is a simple forex trading assistant / analyzer. ')
 
 def new_analysis_choice():
-    print("To analyze new ticker, enter 1. To see most trending assets, enter 2. To return to main menu, enter 3: ")
+    print("To analyze new ticker, enter 1. To see most trending pairs, enter 2. To return to main menu, enter 3: ")
 
     while True:
         try:
@@ -52,41 +56,43 @@ def print_out_analysis_results(ticker, data):
 
 
 
-# TODO: Add option to list out available tickers
-# TODO: Add warning if not known ticker is entered
+
 def run_program():
-    menu_choice = welcome_user()
+    try:
+        menu_choice = welcome_user()
 
-    while menu_choice != 3: # 3 == end of program
-        if menu_choice == 1: # User wants to start new analysis
-            analyze_choice = new_analysis_choice() # user selects between types of analysis
+        while menu_choice != 3: # 3 == end of program
+            if menu_choice == 1: # User wants to start new analysis
+                analyze_choice = new_analysis_choice() # user selects between types of analysis
 
-            while analyze_choice != 3: # 3 == return to main menu
-                if analyze_choice == 1: # Single ticker analysis
-                    ticker = input("Enter a ticker to analyze: ")
-                    asset_analyzer = AssetAnalyzer()
-                    analysis_results = asset_analyzer.analyze_ticker(ticker)
-                    print_out_analysis_results(ticker, analysis_results)
+                while analyze_choice != 3: # 3 == return to main menu
+                    if analyze_choice == 1: # Single ticker analysis
+                        ticker = input("Enter a ticker to analyze: ")
+                        asset_analyzer = AssetAnalyzer()
+                        analysis_results = asset_analyzer.analyze_ticker(ticker)
+                        print_out_analysis_results(ticker, analysis_results)
 
-                    analyze_choice = new_analysis_choice()
+                        analyze_choice = new_analysis_choice()
 
-                elif analyze_choice == 2: # Most trending assets
-                    print("Function not ready yet")
-                    analyze_choice = new_analysis_choice()
+                    elif analyze_choice == 2: # Most trending assets
+                        print("Function not ready yet")
+                        analyze_choice = new_analysis_choice()
 
-                else: # Invalid choice
-                    print("Invalid choice. Please try again.")
-                    analyze_choice = new_analysis_choice()
+                    else: # Invalid choice
+                        print("Invalid choice. Please try again.")
+                        analyze_choice = new_analysis_choice()
 
-            menu_choice = welcome_user() # return to main menu
+                menu_choice = welcome_user() # return to main menu
 
-        elif menu_choice == 2: # User wants help
-            print_help()
-            input("Press enter to return to main menu ")
-            menu_choice = welcome_user()
+            elif menu_choice == 2: # User wants help
+                print_help()
+                input("Press enter to return to main menu ")
+                menu_choice = welcome_user()
 
-    print("End of program")
-
+        print("End of program")
+    except Exception as e:
+        print("Oops, some unexpected error occured. ")
+        logging.error('Error: ', e)
 
 
 

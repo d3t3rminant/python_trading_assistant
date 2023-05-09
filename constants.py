@@ -1,6 +1,4 @@
 class Constants:
-    __MAJOR_ASSETS = ['EURUSD', 'USDJPY', 'GBPUSD', 'USDCHF', 'USDCAD', 'Gold',
-                     'Silver', 'Oil', 'BTCUSD', 'ETHUSD', 'US100']
 
     __TRADING_VIEW_TIME_FRAMES = ['5m', '15m', '1h', '4h', '1D', '1W']
 
@@ -12,11 +10,6 @@ class Constants:
         '86400': '1D',
         'week': '1W'
     }
-
-    __AVAILABLE_TICKERS = ['EURUSD', 'USDJPY', 'AUDNZD'] # TODO: List out all available tickers
-    @property
-    def major_assets(self):
-        return self.__MAJOR_ASSETS
 
     @property
     def trading_view_time_frames(self):
