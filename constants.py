@@ -16,7 +16,37 @@ class Constants:
     }
 
     __KNOWN_FOREX_TICKERS = [
-    'EURUSD'
+        "EURUSD",
+        "USDJPY",
+        "GBPUSD",
+        "USDCHF",
+        "AUDUSD",
+        "USDCAD",
+        "NZDUSD",
+        "EURGBP",
+        "EURJPY",
+        "GBPJPY",
+        "CHFJPY",
+        "AUDJPY",
+        "CADJPY",
+        "NZDJPY",
+        "GBPCHF",
+        "EURCHF",
+        "AUDNZD",
+        "EURCAD",
+        "EURAUD",
+        "GBPCAD",
+        "GBPAUD",
+        "AUDCAD",
+        "AUDCHF",
+        "NZDCAD",
+        "NZDCHF",
+        "EURNOK",
+        "USDNOK",
+        "USDSEK",
+        "EURSEK",
+        "GBPNZD",
+        "EURNZD"
     ]
     @property
     def trading_view_time_frames(self):

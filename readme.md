@@ -11,16 +11,19 @@
 
 **To get started:**
 
-1) On your device, install chrome webdriver into the project folder. You can download it here:
-https://chromedriver.chromium.org/downloads
-Make sure you download and install a driver that suits the version of your Chrome Browser
+1) On your device, install chrome webdriver. (Download here - https://chromedriver.chromium.org/downloads)
+You don't have to add the chromedriver to the path, just copy the chromedriver.exe file into this project's folder.
+Make sure you download and install a driver that suits the version of your Chrome.
+How to check the version of Chrome: 
+https://www.youtube.com/watch?v=49wT_RexweA
+
 2) In case the final asset analysis results are incorrect, try to increase value of x 
 in "time.sleep(x)" (in web_scraper.py methods). This solves some issues in loading content where Selenium Waits are not helpful.
 Workaround to be found in version 2.0 
 
 
 **How it should work:**
-    Some youtube link
+    https://youtu.be/JUCWksD1ahc
 
 **Troubleshooting:**
 
