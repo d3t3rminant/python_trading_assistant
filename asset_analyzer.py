@@ -6,6 +6,11 @@ class AssetAnalyzer:
 
 
     def analyze_ticker(self, ticker):
+        """
+        Uses an instance of WebScraper to scrape data from TradingView, Investing.com and myfxbook.com
+        :param ticker: str, A user's input from app.py, specifying which FX pair is to be analysed
+        :return: dictionary of analysis results from three major sites
+        """
         analysis_data = {}
 
         print("Retrieving data from Trading View, hold on...")
@@ -18,7 +23,13 @@ class AssetAnalyzer:
         analysis_data['sentiment'] = self.web_scraper.get_sentiment(ticker)
         return analysis_data
 
-    def analyze_trending(self, major_assets): # Will do in version 2
+
+    def analyze_trending(self, major_assets):
+        """
+        This method will be done in version 2.0. To make it work, a watchlist of specific assets
+        needs to be created. Then, using a loop, analysis of each ticker in this watchlist will select
+        only fx pairs (or other assets) moving in a strong trend
+        """
         trending_assets = []
         for asset in major_assets:
             analysis_results = self.analyze_ticker(asset)

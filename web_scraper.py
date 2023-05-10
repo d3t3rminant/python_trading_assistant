@@ -1,3 +1,10 @@
+"""
+This module containts class WebScraper, which retrieves data from TradingView, Investing.com and myfxbook
+get_trading_view_data(), get_investing_data() and get_sentiment() are a bit ugly due to locating elements
+by hardcoded paths
+"""
+
+
 import time
 import logging
 import selenium.common.exceptions
@@ -12,7 +19,12 @@ from selenium.webdriver.chrome.options import Options
 logger = logging.getLogger(__name__)
 
 class WebScraper:
-    #Class Variables
+    """
+    A class that scrapes data from TradingView, Investing.com and myfxbook
+    """
+
+
+    # ↓ used to extract trend info from Trading View
     class_trends_trading_view = ["strong-buy", "strong-sell", "buy", "sell", "neutral"] # css class selector in Trading View html
     def __init__(self):
         self.driver = None
@@ -36,30 +48,33 @@ class WebScraper:
         if self.driver is not None:
             self.driver.quit()
             self.driver = None
+
     @staticmethod
     def format_ticker_for_investing(input_str):
+        """
+        Formats the ticker for use with Investing.com.
+
+        :param input_str: The ticker to be formatted (e.g. EURUSD)
+        :return: The formatted ticker (lowercased → eur-usd)
+        """
         if len(input_str) == 6:
             return input_str[:3].lower() + '-' + input_str[3:].lower()
         else:
-            raise ValueError("Input string must be 6 characters long")
+            raise ValueError("Couldn't format provided ticker")
 
     def get_trading_view_data(self, ticker):
         trend_results = {}
-        self.open_browser() # Open browser window
+        self.open_browser()
         try:
-            #Open tradinview.com with a specific ticker to analyse ↓
             self.driver.get(f"https://www.tradingview.com/symbols/{ticker}/technicals/?exchange=FX")
 
 
 
-            for time_frame in self.constants.trading_view_time_frames: # TODO: Change for tf locators/ids
+            for time_frame in self.constants.trading_view_time_frames:
+                # Button to change time frame
                 button_tf = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, time_frame)))
 
                 button_tf.click()
-
-                # In case my code breaks down, this worked :) ↓
-                #time.sleep(1)  # Necessary in order to wait for the right class assignment.
-                #div_container = self.driver.find_element(By.CLASS_NAME, "summary-kg4MJrFB")
 
 
                 div_container = WebDriverWait(self.driver, 5)\
@@ -75,7 +90,14 @@ class WebScraper:
                                          '[class*=strong-buy-]' )
                     )
                 )
-                time.sleep(0.5) # necessary for my sluggish internet to load the correct info lol
+                time.sleep(0.5)
+                """
+                ↑ Using WebDriverWait instead of time.sleep() doesn't help. Elements are visible/present on the page, 
+                but they provide inaccurate info. My suggestion is it's because the content is loaded/displayed with 
+                JS and I haven't found solution. Not yet
+                Update - skipping a CSS and JS animations could help
+                """
+
                 div_summary = div_container.find_element(By.CLASS_NAME, "container-zq7XRf30")
                 class_names = div_summary.get_attribute("class")
 
@@ -105,13 +127,16 @@ class WebScraper:
 
 
 
-    # Unfortunately this method has to run with browser visible to the user, otherwise html elements are not present/interactable
+
     def get_investing_data(self, ticker):
+        """
+        This method has to run with browser visible to the user, otherwise elements are not present on the page.
+        """
         trend_results = {}
         chrome_options = Options()
         chrome_options.add_argument("--start-maximized")
 
-        self.open_browser(chrome_options=chrome_options)  # Open browser window
+        self.open_browser(chrome_options=chrome_options)
 
         try:
             #Open investing.com with a specific ticker to analyse (need to format user's input first ↓)
@@ -186,6 +211,7 @@ class WebScraper:
 
         except Exception as e:
             print(f"Unexpected error while retrieving results from myfxbook.com \n Error: {e}")
+            logging.error('Error: %s', e)
         finally:
             self.close_browser()
 

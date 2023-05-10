@@ -5,8 +5,13 @@ import logging
 logging.basicConfig(filename='logs/app.log', level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+constants = Constants()
 
 def welcome_user():
+    """
+    Display welcome message and ask the user for their choice
+    :return: int: The user's choice, either 1, 2 or 3
+    """
     print("*** Welcome to Forex Trading Assistent 1.0 *** \nTo start analysis, enter '1'. \nTo print help, enter '2' \nTo "
           "exit the program, enter '3'")
     while True:
@@ -21,9 +26,13 @@ def welcome_user():
 
 
 def print_help():
-    print('This is a simple forex trading assistant / analyzer. ')
+    print('This is a simple forex trading assistant / analyzer. More info can be found in readme.md')
 
 def new_analysis_choice():
+    """
+    Prompts the user to choose what kind of analysis is required
+    :return: int: The user's choice, either 1, 2 or 3
+    """
     print("To analyze new ticker, enter 1. To see most trending pairs, enter 2. To return to main menu, enter 3: ")
 
     while True:
@@ -36,28 +45,55 @@ def new_analysis_choice():
         except ValueError:
             print("\nPlease enter a valid number")
 
-
+# The best DRY you've ever seen ↓ :))
 def print_out_analysis_results(ticker, data):
-    print(f"Analysis for {ticker}:")
-    print("- Market Sentiment: {} Short, {} Long".format(data['sentiment']['short'], data['sentiment']['long']))
-    print("- TradingView Technical Analysis:")
-    print("  * Weekly: {}".format(data['trading_view']['1W'].upper()))
-    print("  * Daily: {}".format(data['trading_view']['1D'].upper()))
-    print("  * 4 Hour: {}".format(data['trading_view']['4h'].capitalize()))
-    print("  * 1 Hour: {}".format(data['trading_view']['1h'].capitalize()))
-    print("  * 15 Minute: {}".format(data['trading_view']['15m'].capitalize()))
-    print("  * 5 Minute: {}".format(data['trading_view']['5m'].capitalize()))
-    print("- Investing.com Technical Analysis:")
-    print("  * Weekly: {}".format(data['investing']['1W'].upper()))
-    print("  * Daily: {}".format(data['investing']['1D'].upper()))
-    print("  * 1 Hour: {}".format(data['investing']['1H'].capitalize()))
-    print("  * 15 Minute: {}".format(data['investing']['15M'].capitalize()))
-    print("  * 5 Minute: {}".format(data['investing']['5M'].capitalize()))
+    try:
+        trading_view_data = {k: v.upper() for k, v in data['trading_view'].items()}
+        investing_data = {k: v.upper() for k, v in data['investing'].items()}
+
+        print(f"Analysis for {ticker}:")
+        print("- Market Sentiment: {} Short, {} Long".format(data['sentiment']['short'], data['sentiment']['long']))
+        print("- TradingView Technical Analysis:")
+        print("  * Weekly: {}".format(trading_view_data.get('1W', 'NA')))
+        print("  * Daily: {}".format(trading_view_data.get('1D', 'NA')))
+        print("  * 4 Hour: {}".format(trading_view_data.get('4h', 'NA')))
+        print("  * 1 Hour: {}".format(trading_view_data.get('1h', 'NA')))
+        print("  * 15 Minute: {}".format(trading_view_data.get('15m', 'NA')))
+        print("  * 5 Minute: {}".format(trading_view_data.get('5m', 'NA')))
+        print("- Investing.com Technical Analysis:")
+        print("  * Weekly: {}".format(investing_data.get('1W', 'NA')))
+        print("  * Daily: {}".format(investing_data.get('1D', 'NA')))
+        print("  * 1 Hour: {}".format(investing_data.get('1H', 'NA')))
+        print("  * 15 Minute: {}".format(investing_data.get('15M', 'NA')))
+        print("  * 5 Minute: {}".format(investing_data.get('5M', 'NA')))
+    except:
+        print("Error while trying to print out the analysis ")
 
 
+def ask_user_for_ticker():
+    while True:
+        ticker = input("Please enter a ticker to analyse: ")
+        if ticker.upper() in constants.known_forex_tickers:  # Use the object to access the property
+            return ticker
+        else:
+            print("This ticker is not recognized. Results may not be complete \nTo continue, enter 'Y'"
+                    "\nTo select a new ticker, enter 'N'. \nTo print out list of recognized tickers, enter 'T'.")
+            while True:
+                choice = input('Your choice: ')
+                if choice.upper() == "Y":
+                    return ticker
+                elif choice.upper() == "T":
+                    print(constants.known_forex_tickers)
+                    break
+                elif choice.upper() == "N":
+                    break
 
 
 def run_program():
+    """
+    Run the main program loop. This involves displaying the menu,
+    handling the user's choice and running the appropriate analysis
+    """
     try:
         menu_choice = welcome_user()
 
@@ -67,7 +103,7 @@ def run_program():
 
                 while analyze_choice != 3: # 3 == return to main menu
                     if analyze_choice == 1: # Single ticker analysis
-                        ticker = input("Enter a ticker to analyze: ")
+                        ticker = ask_user_for_ticker()
                         asset_analyzer = AssetAnalyzer()
                         analysis_results = asset_analyzer.analyze_ticker(ticker)
                         print_out_analysis_results(ticker, analysis_results)
@@ -84,19 +120,17 @@ def run_program():
 
                 menu_choice = welcome_user() # return to main menu
 
-            elif menu_choice == 2: # User wants help
+            elif menu_choice == 2: # User wants to print help
                 print_help()
                 input("Press enter to return to main menu ")
                 menu_choice = welcome_user()
 
+        #Menu choice == 3 ↓
         print("End of program")
+
     except Exception as e:
-        print("Oops, some unexpected error occured. ")
-        logging.error('Error: ', e)
-
-
-
-
+        print("Oops, some unexpected error occured. \nProgram shutting down")
+        logger.error('Error: %s', e)
 
 
 
