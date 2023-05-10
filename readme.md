@@ -1,10 +1,12 @@
 **Introduction:**
 
-    A simple Python app that uses Selenium to automate the process of retrieving and compiling technical analysis data 
-    for a user-selected forex pair. The data is sourced from leading financial analysis sites: tradingview.com, investing.com,
-    and myfxbook.com. This app can automate the manual process of searching different sites for a quick technical analysis 
-    overview. The technical analysis provided consists of a summary of moving averages and oscillators on various time frames from 
-    tradingview.com and investing.com, followed by market sentiment from myfxbook.com
+    A simple Python app that uses Selenium to automate the process of retrieving and compiling 
+    technical analysis data for a user-selected forex pair. The data is sourced from leading 
+    financial analysis sites: tradingview.com, investing.com, and myfxbook.com. This app can 
+    automate the manual process of searching different sites for a quick technical analysis 
+    overview. The technical analysis provided consists of a summary of moving averages and 
+    oscillators on various time frames from tradingview.com and investing.com, 
+    followed by market sentiment from myfxbook.com
 
 
 **To get started:**
@@ -28,7 +30,8 @@ Workaround to be found in version 2.0
 
 **Contributing:**
 
-    Note this is my first Python app. Usually it works (90 % of the time), but has a lot of things that could be improved.
+    Note this is my first Python app. Usually it works (90 % of the time), but has a lot of things that 
+    could be improved.
     Version 2.0 will take care of it. If you have any suggestion, please let me know.  
     (Sometimes) ChatGPT is not enough :)
 
@@ -36,5 +39,5 @@ Workaround to be found in version 2.0
 
     Version 2.0. is going to be able to analyse provided list of assets (not only FX pairs) and select
     only those assets that are moving in a (strong) trend, based on given criteria - adjustable. 
-    Also it will have a small web interface hosted on a local server for better clarity and readability of retrieved results.
-    Hopefully I'll be able to reduce the time cost of every process. 
+    Also it will have a small web interface hosted on a local server for better clarity and readability
+    of retrieved results. Hopefully I'll be able to reduce the time cost of every process. 
