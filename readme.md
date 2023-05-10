@@ -1,9 +1,10 @@
-**Intro:**
+**Introduction:**
 
     A simple Python app that uses Selenium to automate the process of retrieving and compiling technical analysis data 
     for a user-selected forex pair. The data is sourced from leading financial analysis sites: tradingview.com, investing.com,
     and myfxbook.com. This app can automate the manual process of searching different sites for a quick technical analysis 
-    overview.
+    overview. The technical analysis provided consists of a summary of moving averages and oscillators on various time frames from 
+    tradingview.com and investing.com, followed by market sentiment from myfxbook.com
 
 
 **To get started:**
